@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Ulang Tahun Uzi 🌸</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ffc0cb, #add8e6);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .hidden { display: none; }
+
+    .intro-box, .question-box, .result, .emoji-game, .memory-game, .greeting-page {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: 20px;
+    }
+
+    h1, h2 {
+      font-size: 2.5rem;
+      color: #ff69b4;
+    }
+
+    button {
+      background-color: #ff84b7;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      padding: 12px 24px;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #ffa6cc;
+      transform: scale(1.05);
+    }
+
+    .question { font-size: 20px; margin-bottom: 20px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 60px;
+      height: 60px;
+      font-size: 32px;
+      background-color: #ffe4f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .card.matched {
+      background-color: transparent;
+      visibility: hidden;
+    }
+  </style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div class="intro-box" id="intro">
+  <h1>Hai uziiiaann</h1>
+  <p>ada tugas penting untuk uzii hari ini! ikuti aja petunjuknya yaa</p>
+  <button onclick="startQuiz()">ayo klik uzii!</button>
+</div>
+
+<!-- KUIS ABSURD -->
+<div class="question-box hidden" id="quiz">
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+</div>
+
+<div class="result hidden" id="result"></div>
+<button class="hidden" id="toGame1" onclick="startEmojiGame()">Lanjut ke Mini Game 🎮</button>
+
+<!-- GAME EMOJI 🌻 -->
+<div class="emoji-game hidden" id="emojiGame">
+  <h2>Cari 🌻 secepatnya!</h2>
+  <p id="timer">Waktu: 10 detik</p>
+  <div id="emojiGrid" class="grid"></div>
+</div>
+<button class="hidden" id="toMemory" onclick="startMemoryGame()">Lanjut ke Game Memory 🧠</button>
+
+<!-- MEMORY GAME -->
+<div class="memory-game hidden" id="memoryGame">
+  <h2>Pasangkan semua emoji yang sama!</h2>
+  <div class="grid" id="memoryGrid"></div>
+  <button class="hidden" id="toGreeting" onclick="showGreeting()">Ke halaman ucapan 🎉</button>
+</div>
+
+<!-- GREETING -->
+<div class="greeting-page hidden" id="greetingPage">
+  <h1>Selamat ulang tahuun Uziii 🎂🌟</h1>
+  <p>Kamu itu orang yang luar biasa, lucu, unik, dan kuat—meski kalau kena hujan, langsung jadi kerupuk melempem 🥹</p>
+  <p>Semoga hari ini dan seterusnya penuh sama hal-hal yang bikin kamu senyum terusss 😘</p>
+  <p>Ada banyak yang sayang kamu. Termasuk akuuu 💖</p>
+</div>
+
+<script>
+  // KUIS
+  const quizData = [
+    {
+      question: "Kalau kamu jadi mie instan, topping kamu apa?",
+      options: ["Coklat batangan", "Es batu", "Bubuk keju dari masa depan"]
+    },
+    {
+      question: "Apa reaksi kamu kalau sandal jepitmu ngilang satu waktu kondangan?",
+      options: ["Balik nyeker dengan bangga", "Numpang naik becak pake dasi", "Ngaku-ngaku sepatu orang lain"]
+    },
+    {
+      question: "Kalau kamu bisa ngomong sama kucing selama 5 detik, kamu bakal…",
+      options: ["Tanya kenapa dia ngeong tiap jam 3 pagi", "Kasih nomor WA", "Minta dia jangan ngejatuhin gelas lagi"]
+    },
+    {
+      question: "Kalau kamu buka kulkas dan isinya cuma lampu, kamu akan…",
+      options: ["Bikin vlog kulkas aesthetic", "Masuk kulkas buat mikir", "Tanya: ‘Apakah ini ujian?’"]
+    },
+    {
+      question: "Pilih kekuatan super yang kamu rasa paling nggak penting:",
+      options: ["Bisa ngebaca pikiran kucing, tapi cuma pas mereka tidur", "Bisa ngilangin bau seblak dari tangan", "Bisa bikin air mendidih cuma dengan lirik dangdut"]
+    }
+  ];
+  let currentQuestion = 0;
+
+  function startQuiz() {
+    document.getElementById('intro').classList.add('hidden');
+    document.getElementById('quiz').classList.remove('hidden');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = quizData[currentQuestion];
+    document.getElementById('question').innerText = q.question;
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.innerText = opt;
+      btn.onclick = nextQuestion;
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+      showQuestion();
+    } else {
+      document.getElementById('quiz').classList.add('hidden');
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('result').innerHTML = "Kamu udah menyelesaikan misi absurd ini.<br><strong>Kamu emang... anak hebat 🎉</strong>";
+      document.getElementById('toGame1').classList.remove('hidden');
+    }
+  }
+
+  // EMOJI GAME
+  function startEmojiGame() {
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('toGame1').classList.add('hidden');
+    document.getElementById('emojiGame').classList.remove('hidden');
+
+    const grid = document.getElementById('emojiGrid');
+    const emojis = ["😖", "🤪", "👻", "🌻", "🎉", "🤢", "😹"];
+    grid.innerHTML = '';
+    let clicked = false;
+
+    for (let i = 0; i < 16; i++) {
+      const btn = document.createElement('button');
+      let randEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      btn.className = 'card';
+      btn.innerText = randEmoji;
+      btn.onclick = () => {
+        if (clicked) return;
+        if (btn.innerText === '🌻') {
+          alert('Yay kamu nemu 🌻!');
+          document.getElementById('emojiGame').classList.add('hidden');
+          document.getElementById('toMemory').classList.remove('hidden');
+          clicked = true;
+        } else {
+          btn.disabled = true;
+        }
+      };
+      grid.appendChild(btn);
+    }
+
+    let timeLeft = 10;
+    const timer = document.getElementById('timer');
+    const countdown = setInterval(() => {
+      timeLeft--;
+      timer.innerText = `Waktu: ${timeLeft} detik`;
+      if (timeLeft <= 0 || clicked) {
+        clearInterval(countdown);
+        if (!clicked) alert('Yaah Waktu habis! Tapi tetap anak hebat');
+        document.getElementById('emojiGame').classList.add('hidden');
+        document.getElementById('toMemory').classList.remove('hidden');
+      }
+    }, 1000);
+  }
+
+  // MEMORY GAME
+  function startMemoryGame() {
+    document.getElementById('toMemory').classList.add('hidden');
+    document.getElementById('memoryGame').classList.remove('hidden');
+
+    const emojis = ["😹","👻","🌻","🎉","🤢","😖","🤪"];
+    const cards = [...emojis, ...emojis];
+    cards.sort(() => 0.5 - Math.random());
+
+    const grid = document.getElementById('memoryGrid');
+    grid.innerHTML = '';
+    let firstCard = null, secondCard = null, lock = false;
+    let matchedCount = 0;
+
+    cards.forEach(emoji => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerText = '❓';
+      card.dataset.emoji = emoji;
+
+      card.onclick = () => {
+        if (lock || card.classList.contains('matched') || card.innerText !== '❓') return;
+        card.innerText = card.dataset.emoji;
+
+        if (!firstCard) {
+          firstCard = card;
+        } else {
+          secondCard = card;
+          lock = true;
+
+          if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            matchedCount++;
+            firstCard = null;
+            secondCard = null;
+            lock = false;
+
+            if (matchedCount === emojis.length) {
+              document.getElementById('toGreeting').classList.remove('hidden');
+            }
+
+          } else {
+            setTimeout(() => {
+              firstCard.innerText = '❓';
+              secondCard.innerText = '❓';
+              firstCard = null;
+              secondCard = null;
+              lock = false;
+            }, 1000);
+          }
+        }
+      };
+      grid.appendChild(card);
+    });
+  }
+
+  function showGreeting() {
+    document.getElementById('memoryGame').classList.add('hidden');
+    document.getElementById('greetingPage').classList.remove('hidden');
+  }
+</script>
+</body>
+</html>
